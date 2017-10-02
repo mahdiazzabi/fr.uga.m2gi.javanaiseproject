@@ -13,13 +13,31 @@ import java.io.Serializable;
 
 public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord {
 
+	private static JvnCoordImpl jvnCoord = null;
 	/**
 	 * Default constructor
 	 * 
 	 * @throws JvnException
 	 **/
 	private JvnCoordImpl() throws Exception {
-		// to be completed
+		super();
+	}
+	
+	public static JvnCoordImpl getJvnCoordImpl() {
+		if (JvnCoordImpl.jvnCoord == null) {
+			synchronized (jvnCoord) {
+				if (JvnCoordImpl.jvnCoord == null) {
+					try {
+						jvnCoord = new JvnCoordImpl();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
+		return jvnCoord;
 	}
 
 	/**

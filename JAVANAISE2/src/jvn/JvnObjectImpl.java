@@ -32,7 +32,7 @@ public class JvnObjectImpl implements JvnObject {
 
 	public Serializable jvnGetObjectState() throws JvnException {
 		// TODO Auto-generated method stub
-		return null;
+		return this.object;
 	}
 
 	public void jvnInvalidateReader() throws JvnException {

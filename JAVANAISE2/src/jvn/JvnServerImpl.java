@@ -8,6 +8,7 @@
 
 package jvn;
 
+import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.io.*;
 
@@ -75,7 +76,12 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 * @throws JvnException
 	 **/
 	public void jvnRegisterObject(String jon, JvnObject jo) throws jvn.JvnException {
-		// to be completed
+		try {
+			JvnCoordImpl.getJvnCoordImpl().jvnRegisterObject(jon, jo, js);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
