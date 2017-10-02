@@ -60,8 +60,9 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 * @throws JvnException
 	 **/
 	public JvnObject jvnCreateObject(Serializable o) throws jvn.JvnException {
-		// to be completed
-		return null;
+		JvnObjectImpl jvnObjectImpl = new JvnObjectImpl(o);
+		
+		return jvnObjectImpl;
 	}
 
 	/**

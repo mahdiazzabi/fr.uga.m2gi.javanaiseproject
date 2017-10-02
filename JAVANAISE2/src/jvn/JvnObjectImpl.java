@@ -3,9 +3,11 @@ package jvn;
 import java.io.Serializable;
 
 public class JvnObjectImpl implements JvnObject {
+	
+	private Serializable object = null;
 
-	public JvnObjectImpl() {
-		// TODO Auto-generated constructor stub
+	public JvnObjectImpl(Serializable object) {
+		this.object = object;
 	}
 	
 	public void jvnLockRead() throws JvnException {

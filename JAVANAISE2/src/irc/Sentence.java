@@ -33,5 +33,4 @@ public class Sentence implements java.io.Serializable {
 		
 		return this;
 	}
-
 }
