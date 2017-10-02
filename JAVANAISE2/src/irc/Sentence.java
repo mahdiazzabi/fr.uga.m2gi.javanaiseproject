@@ -9,6 +9,7 @@
 package irc;
 
 public class Sentence implements java.io.Serializable {
+	private int id;
 	String data;
 
 	public Sentence() {
@@ -21,6 +22,16 @@ public class Sentence implements java.io.Serializable {
 
 	public String read() {
 		return data;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public Sentence setId(int id) {
+		this.id = id;
+		
+		return this;
 	}
 
 }
