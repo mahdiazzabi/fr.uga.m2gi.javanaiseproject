@@ -8,12 +8,20 @@
 
 package jvn;
 
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 import java.io.Serializable;
+import java.net.MalformedURLException;
 
-public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord {
+public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord  {
 
 	private static JvnCoordImpl jvnCoord = null;
+	private HashMap<String, JvnObject> jvnObjects;
+
 	/**
 	 * Default constructor
 	 * 
@@ -21,22 +29,22 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 **/
 	private JvnCoordImpl() throws Exception {
 		super();
+		jvnObjects = new HashMap<String, JvnObject>();
 	}
-	
+
 	public static JvnCoordImpl getJvnCoordImpl() {
-		if (JvnCoordImpl.jvnCoord == null) {
-			synchronized (jvnCoord) {
-				if (JvnCoordImpl.jvnCoord == null) {
+		if (jvnCoord == null) {
+			synchronized (JvnCoordImpl.class) {
+				if (jvnCoord == null) {
 					try {
 						jvnCoord = new JvnCoordImpl();
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 			}
 		}
-		
+
 		return jvnCoord;
 	}
 
@@ -66,7 +74,23 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 **/
 	public void jvnRegisterObject(String jon, JvnObject jo, JvnRemoteServer js)
 			throws java.rmi.RemoteException, jvn.JvnException {
-		// to be completed
+		jvnObjects.put(jon, jo);
+
+	}
+
+	public static void main(String argv[]) {
+
+		try {
+			Registry reg = LocateRegistry.createRegistry(2049);
+			JvnCoordImpl jvnCoord = getJvnCoordImpl();
+			Naming.rebind("rmi://localhost:2049/refcoord", jvnCoord);
+			System.out.println("serveur coord en marche");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println("serveur coord erreur :");
+			e.printStackTrace();
+		}
+
 	}
 
 	/**
@@ -79,8 +103,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 * @throws java.rmi.RemoteException,JvnException
 	 **/
 	public JvnObject jvnLookupObject(String jon, JvnRemoteServer js) throws java.rmi.RemoteException, jvn.JvnException {
-		// to be completed
-		return null;
+		return jvnObjects.get(jon);
 	}
 
 	/**
@@ -126,4 +149,13 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	public void jvnTerminate(JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
 		// to be completed
 	}
+
+	public HashMap<String, JvnObject> getJvnObjects() {
+		return jvnObjects;
+	}
+
+	public void setJvnObjects(HashMap<String, JvnObject> jvnObjects) {
+		this.jvnObjects = jvnObjects;
+	}
+	
 }

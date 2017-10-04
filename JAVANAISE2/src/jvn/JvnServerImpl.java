@@ -8,6 +8,7 @@
 
 package jvn;
 
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.io.*;
@@ -17,6 +18,9 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	// A JVN server is managed as a singleton
 	private static JvnServerImpl js = null;
 
+	// the remote reference of the JVNServer
+	private static JvnRemoteCoord jsCoord = null ; 
+	
 	/**
 	 * Default constructor
 	 * 
@@ -25,6 +29,13 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	private JvnServerImpl() throws Exception {
 		super();
 		// to be completed
+		try {
+			jsCoord = (JvnRemoteCoord) Naming.lookup("rmi://localhost:2049/refcoord");
+				
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+		}
+		
 	}
 
 	/**
@@ -62,7 +73,6 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 **/
 	public JvnObject jvnCreateObject(Serializable o) throws jvn.JvnException {
 		JvnObjectImpl jvnObjectImpl = new JvnObjectImpl(o);
-		
 		return jvnObjectImpl;
 	}
 
@@ -77,7 +87,8 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 **/
 	public void jvnRegisterObject(String jon, JvnObject jo) throws jvn.JvnException {
 		try {
-			JvnCoordImpl.getJvnCoordImpl().jvnRegisterObject(jon, jo, js);
+			jsCoord.jvnRegisterObject(jon, jo, js);
+			//JvnCoordImpl.getJvnCoordImpl().jvnRegisterObject(jon, jo, js);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -94,7 +105,12 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 **/
 	public JvnObject jvnLookupObject(String jon) throws jvn.JvnException {
 		// to be completed
-		return null;
+		try {
+			return jsCoord.jvnLookupObject(jon, this);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			throw new JvnException("jvnLookupObject Error");
+		}
 	}
 
 	/**
