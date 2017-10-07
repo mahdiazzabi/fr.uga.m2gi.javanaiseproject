@@ -26,7 +26,30 @@ public class JvnObjectImpl implements JvnObject {
 	}
 
 	public void jvnLockWrite() throws JvnException {
-		this.setLock(LockState.WLT);
+		synchronized (this.object) {
+			switch (this.lock) {
+				case NL:
+					this.setLock(LockState.WLT);
+					break;
+				case RLC:
+					
+					break;
+				case WLC:
+				
+					break;
+				case RLT:
+					
+					break;
+				case WLT:
+					
+					break;
+				case RLTWLC:
+					
+					break;
+				default:
+					break;
+			}
+		}
 		
 		System.out.println(this.lock);
 	}
