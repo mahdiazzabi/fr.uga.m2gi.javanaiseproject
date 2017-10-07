@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class JvnObjectImpl implements JvnObject {
 	
 	private Serializable object = null;
-	transient private LockState lock;
+	transient private LockState lock = LockState.NL;
 	
 	private enum LockState {
 	    NL,    // no local lock
