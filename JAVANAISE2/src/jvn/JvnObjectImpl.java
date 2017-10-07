@@ -8,12 +8,12 @@ public class JvnObjectImpl implements JvnObject {
 	transient private LockState lock = LockState.NL;
 	
 	private enum LockState {
-	    NL,    // no local lock
-        RLC,   // read lock cached
-        WLC,   // write lock cached
-        RLT,   // read lock taken
-        WLT,   // write lock taken
-        RLTWLC; // read lock taken & write lock cached
+		NL,    // no local lock
+		RLC,   // read lock cached
+		WLC,   // write lock cached
+		RLT,   // read lock taken
+		WLT,   // write lock taken
+		RLTWLC; // read lock taken & write lock cached
 	}
 
 	public JvnObjectImpl(Serializable object) {
