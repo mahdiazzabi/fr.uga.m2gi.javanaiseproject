@@ -72,8 +72,13 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 * @throws JvnException
 	 **/
 	public JvnObject jvnCreateObject(Serializable o) throws jvn.JvnException {
-		JvnObjectImpl jvnObjectImpl = new JvnObjectImpl(o);
-		return jvnObjectImpl;
+		try {
+			JvnObjectImpl jvnObjectImpl = new JvnObjectImpl(o, jsCoord.jvnGetObjectId());
+			
+			return jvnObjectImpl;
+		} catch (RemoteException e) {
+			throw new JvnException("JvnServerImpl:jvnCreateObject Error : " + e.getMessage());
+		}
 	}
 
 	/**
@@ -122,9 +127,11 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 * @throws JvnException
 	 **/
 	public Serializable jvnLockRead(int joi) throws JvnException {
-		// to be completed
-		return null;
-
+		try {
+			return jsCoord.jvnLockRead(joi, js);
+		} catch (RemoteException e) {
+			throw new JvnException("Error jvnLockRead : " + e.getMessage());
+		}
 	}
 
 	/**

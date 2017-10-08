@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class JvnObjectImpl implements JvnObject {
 
+	int joi;
 	private Serializable object = null;
 	transient private LockState lock = LockState.NL;
 
@@ -16,9 +17,13 @@ public class JvnObjectImpl implements JvnObject {
 		RLTWLC; // read lock taken & write lock cached
 	}
 
-	public JvnObjectImpl(Serializable object) {
+	public JvnObjectImpl(
+			Serializable object,
+			int joi
+	) {
 		this.object = object;
 		this.setLock(LockState.NL);
+		this.joi = joi;
 	}
 
 	public void jvnLockRead() throws JvnException {
@@ -26,7 +31,7 @@ public class JvnObjectImpl implements JvnObject {
 			System.out.print("Operation LockRead : initial state : "+ this.lock + " " );
 			
 			if (this.lock == LockState.NL) {
-				// we will ask the coordinateur to take lock R and then this.setLock(LockState.RLT);
+				jvnObject = JvnServerImpl.jvnGetServer().jvnLockRead(this.joi);
 				this.setLock(LockState.RLT);
 			} else if(this.lock == LockState.WLC) {
 				this.setLock(LockState.RLTWLC);
