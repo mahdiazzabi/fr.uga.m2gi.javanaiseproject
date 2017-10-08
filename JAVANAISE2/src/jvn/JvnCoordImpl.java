@@ -101,7 +101,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 *            : the remote reference of the JVNServer
 	 * @throws java.rmi.RemoteException,JvnException
 	 **/
-	public void jvnRegisterObject(String jon, JvnObject jo, JvnRemoteServer js)
+	public synchronized void jvnRegisterObject(String jon, JvnObject jo, JvnRemoteServer js)
 		throws java.rmi.RemoteException, jvn.JvnException {
 		
 		jvnObjects.put(jon, jo);
@@ -134,7 +134,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 *            : the remote reference of the JVNServer
 	 * @throws java.rmi.RemoteException,JvnException
 	 **/
-	public JvnObject jvnLookupObject(String jon, JvnRemoteServer js) throws java.rmi.RemoteException, jvn.JvnException {
+	public synchronized JvnObject jvnLookupObject(String jon, JvnRemoteServer js) throws java.rmi.RemoteException, jvn.JvnException {
 		return jvnObjects.get(jon);
 	}
 
@@ -149,7 +149,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 * @throws java.rmi.RemoteException,
 	 *             JvnException
 	 **/
-	public Serializable jvnLockRead(int joi, JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
+	public synchronized Serializable jvnLockRead(int joi, JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
 		System.out.println("JvnCoordImpl:jvnLockRead");
 		Serializable object;
 
@@ -173,7 +173,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 * @throws java.rmi.RemoteException,
 	 *             JvnException
 	 **/
-	public Serializable jvnLockWrite(int joi, JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
+	public synchronized Serializable jvnLockWrite(int joi, JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
 		System.out.println("JvnCoordImpl:jvnLockWrite");
 		Serializable object;
 
@@ -198,7 +198,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 * @throws java.rmi.RemoteException,
 	 *             JvnException
 	 **/
-	public void jvnTerminate(JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
+	public synchronized void jvnTerminate(JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
 		// to be completed
 	}
 
