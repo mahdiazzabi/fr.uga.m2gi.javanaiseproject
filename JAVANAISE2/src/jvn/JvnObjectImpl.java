@@ -31,7 +31,7 @@ public class JvnObjectImpl implements JvnObject {
 			System.out.print("Operation LockRead : initial state : "+ this.lock + " " );
 			
 			if (this.lock == LockState.NL) {
-				jvnObject = JvnServerImpl.jvnGetServer().jvnLockRead(this.joi);
+				object = JvnServerImpl.jvnGetServer().jvnLockRead(this.joi);
 				this.setLock(LockState.RLT);
 			} else if(this.lock == LockState.WLC) {
 				this.setLock(LockState.RLTWLC);
