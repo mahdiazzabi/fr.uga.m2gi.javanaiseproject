@@ -154,11 +154,16 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 		Serializable object;
 
 		if (writeServer.containsKey(joi)) {
+			System.out.println(writeServer.toString() + "has write lock on object " + joi);
 			object = writeServer.get(joi).jvnInvalidateWriterForReader(joi);
+			writeServer.remove(joi);
 		} else {
 			readServer.get(joi).add(js);
 			object = jvnObjects.get(jvnReferences.get(joi));
 		}
+
+		readServer.get(joi).add(js);
+
 		return object;
 	}
 
@@ -181,12 +186,15 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 			object = writeServer.get(joi).jvnInvalidateWriter(joi);
 			writeServer.put(joi, js);
 		} else {
-				for (JvnRemoteServer jvnRemoteServer : readServer.get(joi)) {
-					jvnRemoteServer.jvnInvalidateReader(joi);
-				}
+
+			for (JvnRemoteServer jvnRemoteServer : readServer.get(joi)) {
+				jvnRemoteServer.jvnInvalidateReader(joi);
+			}
+
 			object = jvnObjects.get(jvnReferences.get(joi));
 			writeServer.put(joi, js);
 		}
+
 		return object;
 	}
 
