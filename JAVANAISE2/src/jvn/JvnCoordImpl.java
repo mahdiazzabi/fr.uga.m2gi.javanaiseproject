@@ -16,11 +16,26 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.io.Serializable;
 import java.net.MalformedURLException;
+import java.util.logging.Logger;
 
 public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord  {
 
 	private static JvnCoordImpl jvnCoord = null;
+
+	/**
+	 *  Jvn objects
+	 */
 	private HashMap<String, JvnObject> jvnObjects;
+	/**
+	 * Jvn remote servers
+	 */
+	private HashMap<Integer, JvnRemoteServer> jvnRemoteServers;
+	/**
+	 * Link name and id of jvnObjects
+	 */
+	private HashMap<Integer, String> jvnReferences;
+
+	private int id;
 
 	/**
 	 * Default constructor
@@ -29,7 +44,11 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 **/
 	private JvnCoordImpl() throws Exception {
 		super();
-		jvnObjects = new HashMap<String, JvnObject>();
+
+		this.jvnObjects = new HashMap<String, JvnObject>();
+		this.jvnReferences = new HashMap<Integer, String>();
+		this.jvnRemoteServers = new HashMap<Integer, JvnRemoteServer>();
+		this.id = 0;
 	}
 
 	public static JvnCoordImpl getJvnCoordImpl() {
@@ -55,8 +74,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 * @throws java.rmi.RemoteException,JvnException
 	 **/
 	public int jvnGetObjectId() throws java.rmi.RemoteException, jvn.JvnException {
-		// to be completed
-		return 0;
+		return id++;
 	}
 
 	/**
@@ -73,9 +91,11 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 * @throws java.rmi.RemoteException,JvnException
 	 **/
 	public void jvnRegisterObject(String jon, JvnObject jo, JvnRemoteServer js)
-			throws java.rmi.RemoteException, jvn.JvnException {
-		jvnObjects.put(jon, jo);
+		throws java.rmi.RemoteException, jvn.JvnException {
 
+		jvnObjects.put(jon, jo);
+		jvnReferences.put(jo.jvnGetObjectId(), jon);
+		jvnRemoteServers.put(jo.jvnGetObjectId(), js);
 	}
 
 	public static void main(String argv[]) {
@@ -118,8 +138,20 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 *             JvnException
 	 **/
 	public Serializable jvnLockRead(int joi, JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
-		// to be completed
-		return null;
+		System.out.println("JvnCoordImpl:jvnLockRead");
+		Serializable object;
+
+		// Get write server
+		JvnRemoteServer writeServer = this.jvnRemoteServers.get(joi);
+
+		if (writeServer != null) {
+			object = writeServer.jvnInvalidateWriterForReader(joi);
+
+		} else {
+			object = jvnObjects.get(jvnReferences.get(joi));
+		}
+
+		return object;
 	}
 
 	/**
