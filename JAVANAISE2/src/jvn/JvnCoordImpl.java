@@ -29,11 +29,19 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	/**
 	 * Jvn remote servers
 	 */
-	private HashMap<Integer, JvnRemoteServer> jvnRemoteServers;
+	private HashMap<String, JvnRemoteServer> jvnRemoteServers;
 	/**
 	 * Link name and id of jvnObjects
 	 */
 	private HashMap<Integer, String> jvnReferences;
+	/**
+	 * Link id of jvnObjects tooked in write lock with JvnRemoteServer associated
+	 */
+	private HashMap<Integer, JvnRemoteServer> writeServer;
+	/**
+	 * Link id of jvnObjects tooked in read lock with JvnRemoteServer associated
+	 */
+	private HashMap<Integer, JvnRemoteServer> readServer;
 
 	private int id;
 
@@ -47,7 +55,9 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 
 		this.jvnObjects = new HashMap<String, JvnObject>();
 		this.jvnReferences = new HashMap<Integer, String>();
-		this.jvnRemoteServers = new HashMap<Integer, JvnRemoteServer>();
+		this.jvnRemoteServers = new HashMap<String, JvnRemoteServer>();
+		this.writeServer = new HashMap<Integer, JvnRemoteServer>();
+		this.readServer = new HashMap<Integer, JvnRemoteServer>();
 		this.id = 0;
 	}
 
@@ -92,10 +102,11 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 **/
 	public void jvnRegisterObject(String jon, JvnObject jo, JvnRemoteServer js)
 		throws java.rmi.RemoteException, jvn.JvnException {
-
+		
 		jvnObjects.put(jon, jo);
 		jvnReferences.put(jo.jvnGetObjectId(), jon);
-		jvnRemoteServers.put(jo.jvnGetObjectId(), js);
+		jvnRemoteServers.put(jon, js);
+		writeServer.put(jo.jvnGetObjectId(), js);
 	}
 
 	public static void main(String argv[]) {
@@ -141,16 +152,12 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 		System.out.println("JvnCoordImpl:jvnLockRead");
 		Serializable object;
 
-		// Get write server
-		JvnRemoteServer writeServer = this.jvnRemoteServers.get(joi);
-
-		if (writeServer != null) {
-			object = writeServer.jvnInvalidateWriterForReader(joi);
-
+		if (writeServer.containsKey(joi)) {
+			object = writeServer.get(joi).jvnInvalidateWriterForReader(joi);
 		} else {
+			readServer.put(joi, js);
 			object = jvnObjects.get(jvnReferences.get(joi));
 		}
-
 		return object;
 	}
 
