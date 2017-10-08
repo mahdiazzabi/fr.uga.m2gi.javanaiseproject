@@ -13,6 +13,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -41,7 +42,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	/**
 	 * Link id of jvnObjects tooked in read lock with JvnRemoteServer associated
 	 */
-	private HashMap<Integer, JvnRemoteServer> readServer;
+	private HashMap<Integer, ArrayList<JvnRemoteServer>> readServer;
 
 	private int id;
 
@@ -57,7 +58,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 		this.jvnReferences = new HashMap<Integer, String>();
 		this.jvnRemoteServers = new HashMap<String, JvnRemoteServer>();
 		this.writeServer = new HashMap<Integer, JvnRemoteServer>();
-		this.readServer = new HashMap<Integer, JvnRemoteServer>();
+		this.readServer = new HashMap<Integer, ArrayList<JvnRemoteServer>>();
 		this.id = 0;
 	}
 
@@ -155,7 +156,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 		if (writeServer.containsKey(joi)) {
 			object = writeServer.get(joi).jvnInvalidateWriterForReader(joi);
 		} else {
-			readServer.put(joi, js);
+			readServer.get(joi).add(js);
 			object = jvnObjects.get(jvnReferences.get(joi));
 		}
 		return object;
@@ -173,8 +174,20 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 *             JvnException
 	 **/
 	public Serializable jvnLockWrite(int joi, JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
-		// to be completed
-		return null;
+		System.out.println("JvnCoordImpl:jvnLockWrite");
+		Serializable object;
+
+		if (writeServer.containsKey(joi)) {
+			object = writeServer.get(joi).jvnInvalidateWriter(joi);
+			writeServer.put(joi, js);
+		} else {
+				for (JvnRemoteServer jvnRemoteServer : readServer.get(joi)) {
+					jvnRemoteServer.jvnInvalidateReader(joi);
+				}
+			object = jvnObjects.get(jvnReferences.get(joi));
+			writeServer.put(joi, js);
+		}
+		return object;
 	}
 
 	/**
