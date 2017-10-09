@@ -159,11 +159,16 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 			object = writeServer.get(joi).jvnInvalidateWriterForReader(joi);
 			writeServer.remove(joi);
 		} else {
-			readServer.get(joi).add(js);
+			System.out.println("Write server has not write lock on object " + joi);
+
 			object = jvnObjects.get(jvnReferences.get(joi));
 		}
 
-		readServer.get(joi).add(js);
+		if (!readServer.containsKey(joi)) {
+			readServer.put(joi, new ArrayList<JvnRemoteServer>(){{add(js);}});
+		} else {
+			readServer.get(joi).add(js);
+		}
 
 		return object;
 	}
@@ -180,12 +185,11 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 *             JvnException
 	 **/
 	public synchronized Serializable jvnLockWrite(int joi, JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
-		System.out.println("JvnCoordImpl:jvnLockWrite");
+		System.out.println("JvnCoordImpl:jvnLockWrite joi : " + joi);
 		Serializable object;
 
 		if (writeServer.containsKey(joi)) {
 			object = writeServer.get(joi).jvnInvalidateWriter(joi);
-			writeServer.put(joi, js);
 		} else {
 
 			for (JvnRemoteServer jvnRemoteServer : readServer.get(joi)) {
@@ -193,8 +197,9 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 			}
 
 			object = jvnObjects.get(jvnReferences.get(joi));
-			writeServer.put(joi, js);
 		}
+
+		writeServer.put(joi, js);
 
 		return object;
 	}
