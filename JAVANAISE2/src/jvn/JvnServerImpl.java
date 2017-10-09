@@ -173,7 +173,7 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 		JvnObject object = jvnObjects.get(joi);
 
 		if (object == null) {
-			throw new JvnException("Jvn objects not find in local server");
+			throw new JvnException("JvnServerImpl:jvnInvalidateReader Error : Jvn objects not find in local server");
 		}
 
 		try {
@@ -195,7 +195,7 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 		JvnObject object = jvnObjects.get(joi);
 
 		if (object == null) {
-			throw new JvnException("Jvn objects not find in local server");
+			throw new JvnException("JvnServerImpl:jvnInvalidateWriter Error :Jvn objects not find in local server");
 		}
 
 		return object.jvnInvalidateWriter();
