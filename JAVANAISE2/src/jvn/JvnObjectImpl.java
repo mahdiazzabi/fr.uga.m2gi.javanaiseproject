@@ -22,7 +22,7 @@ public class JvnObjectImpl implements JvnObject {
 			int joi
 	) {
 		this.object = object;
-		this.setLock(LockState.NL);
+		this.setLock(LockState.WLT);
 		this.joi = joi;
 	}
 
@@ -102,8 +102,16 @@ public class JvnObjectImpl implements JvnObject {
 	}
 
 	public void jvnInvalidateReader() throws JvnException {
-		// TODO Auto-generated method stub
-
+		synchronized (this.object) {
+			while (this.lock == LockState.RLT) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			jvnUnLock();
+		}
 	}
 
 	public Serializable jvnInvalidateWriter() throws JvnException {
