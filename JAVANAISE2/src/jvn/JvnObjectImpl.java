@@ -51,7 +51,7 @@ public class JvnObjectImpl implements JvnObject {
 
 		System.out.println("Operation LockWrite : initial state : " + this.lock + " Object : " + joi);
 
-		if (this.lock == LockState.NL) {
+		if (this.lock == LockState.NL || this.lock == LockState.RLC) {
 			object = JvnServerImpl.jvnGetServer().jvnLockWrite(this.joi);
 			this.setLock(LockState.WLT);
 		} else {
@@ -91,8 +91,7 @@ public class JvnObjectImpl implements JvnObject {
 	}
 
 	public int jvnGetObjectId() throws JvnException {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.joi;
 	}
 
 	public Serializable jvnGetObjectState() throws JvnException {
