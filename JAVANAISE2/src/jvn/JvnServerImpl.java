@@ -173,7 +173,11 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 			throw new JvnException("Jvn objects not find in local server");
 		}
 
-		object.jvnInvalidateReader();
+		try {
+			object.jvnInvalidateReader();
+		} catch (JvnException e) {
+			throw new JvnException("JvnServerImpl:jvnInvalidateReader Error : " + e);
+		}
 	};
 
 	/**
