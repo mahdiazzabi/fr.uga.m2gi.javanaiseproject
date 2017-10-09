@@ -29,25 +29,26 @@ public class JvnObjectImpl implements JvnObject {
 	public void jvnLockRead() throws JvnException {
 		synchronized (this.object) {
 			System.out.print("Operation LockRead : initial state : "+ this.lock + " " );
-			
+
 			if (this.lock == LockState.NL) {
 				object = JvnServerImpl.jvnGetServer().jvnLockRead(this.joi);
 				this.setLock(LockState.RLT);
-			} else if(this.lock == LockState.WLC) {
+			} else if (this.lock == LockState.WLC) {
 				this.setLock(LockState.RLTWLC);
-			} else if(this.lock == LockState.RLC)
+			} else if (this.lock == LockState.RLC) {
 				this.setLock(LockState.RLT);
+			}
 			//nous considérons que si l'objet est vérrouillé en écriture WLT
 			//nous gardons le verrous WLT car > RLT
 
-			System.out.println("passed to : "+ this.lock );
+			System.out.println("passed to : " + this.lock );
 		}
 	}
 
 	public void jvnLockWrite() throws JvnException {
 		synchronized (this.object) {
 
-			System.out.print("Operation LockWrite : initial state : "+ this.lock +" ");
+			System.out.println("Operation LockWrite : initial state : " + this.lock + " Object : " + joi);
 			if (this.lock == LockState.NL) {
 				object = JvnServerImpl.jvnGetServer().jvnLockWrite(this.joi);
 				this.setLock(LockState.WLT);
@@ -63,27 +64,27 @@ public class JvnObjectImpl implements JvnObject {
 	public void jvnUnLock() throws JvnException {
 		synchronized (this.object) {
 
-			System.out.print("Unlock operation : initial lock :" + this.lock + " ");
+			System.out.println("Unlock operation : initial lock :" + this.lock + " ");
 			switch (this.lock) {
-			case NL:
-				break;
-			case RLC:
-				this.setLock(LockState.NL);
-				break;
-			case WLC:
-				this.setLock(LockState.NL);
-				break;
-			case RLT:
-				this.setLock(LockState.RLC);
-				break;
-			case WLT:
-				this.setLock(LockState.WLC);
-				break;
-			case RLTWLC:
-				this.setLock(LockState.WLC);
-				break;
-			default:
-				break;
+				case NL:
+					break;
+				case RLC:
+					this.setLock(LockState.NL);
+					break;
+				case WLC:
+					this.setLock(LockState.NL);
+					break;
+				case RLT:
+					this.setLock(LockState.RLC);
+					break;
+				case WLT:
+					this.setLock(LockState.WLC);
+					break;
+				case RLTWLC:
+					this.setLock(LockState.WLC);
+					break;
+				default:
+					throw new JvnException("jvnUnlock Error");
 			}
 		}
 

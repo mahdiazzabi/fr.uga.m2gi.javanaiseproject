@@ -154,7 +154,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 		Serializable object;
 
 		if (writeServer.containsKey(joi)) {
-			System.out.println(writeServer.toString() + "has write lock on object " + joi);
+			System.out.println("Write server has write lock on object " + joi);
 			object = writeServer.get(joi).jvnInvalidateWriterForReader(joi);
 			writeServer.remove(joi);
 		} else {

@@ -150,6 +150,7 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 **/
 	public Serializable jvnLockWrite(int joi) throws JvnException {
 		try {
+			System.out.println("JvnServImpl:jvnLockWrite object : " + joi);
 			return jsCoord.jvnLockWrite(joi, js);
 		} catch (RemoteException e) {
 			throw new JvnException("Error jvnLockWrite : " + e.getMessage());
