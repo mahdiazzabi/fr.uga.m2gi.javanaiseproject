@@ -23,7 +23,7 @@ public class JvnObjectImpl implements JvnObject {
 		this.joi = joi;
 	}
 
-	public void jvnLockRead() throws JvnException {
+	public synchronized void jvnLockRead() throws JvnException {
 		if (this.lock == null) {
 			this.lock = LockState.NL;
 		}
@@ -44,11 +44,11 @@ public class JvnObjectImpl implements JvnObject {
 		System.out.println("passed to : " + this.lock);
 	}
 
-	public void jvnLockWrite() throws JvnException {
+	public synchronized void jvnLockWrite() throws JvnException {
 		if (this.lock == null) {
 			this.lock = LockState.NL;
 		}
-		
+
 		System.out.println("Operation LockWrite : initial state : " + this.lock + " Object : " + joi);
 
 		if (this.lock == LockState.NL) {
@@ -61,7 +61,7 @@ public class JvnObjectImpl implements JvnObject {
 		System.out.println("passed to : " + this.lock);
 	}
 
-	public void jvnUnLock() throws JvnException {
+	public synchronized void jvnUnLock() throws JvnException {
 		System.out.print("Unlock operation : initial lock :" + this.lock + " ");
 		switch (this.lock) {
 			case NL:
@@ -85,6 +85,8 @@ public class JvnObjectImpl implements JvnObject {
 				throw new JvnException("jvnUnlock Error");
 		}
 
+		notify();
+
 		System.out.println(" passed to :" + this.lock);
 	}
 
@@ -98,7 +100,7 @@ public class JvnObjectImpl implements JvnObject {
 		return this.object;
 	}
 
-	public void jvnInvalidateReader() throws JvnException {
+	public synchronized void jvnInvalidateReader() throws JvnException {
 		while (this.lock == LockState.RLT) {
 			try {
 				wait();
@@ -110,7 +112,7 @@ public class JvnObjectImpl implements JvnObject {
 		jvnUnLock();
 	}
 
-	public Serializable jvnInvalidateWriter() throws JvnException {
+	public synchronized Serializable jvnInvalidateWriter() throws JvnException {
 		while (this.lock == LockState.WLT) {
 			try {
 				wait();
@@ -124,7 +126,7 @@ public class JvnObjectImpl implements JvnObject {
 		return this.object;
 	}
 
-	public Serializable jvnInvalidateWriterForReader() throws JvnException {
+	public synchronized Serializable jvnInvalidateWriterForReader() throws JvnException {
 		while (this.lock == LockState.WLT) {
 			try {
 				wait();
