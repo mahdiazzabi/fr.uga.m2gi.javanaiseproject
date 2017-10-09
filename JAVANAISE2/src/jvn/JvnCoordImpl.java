@@ -193,6 +193,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 		} else {
 
 			for (JvnRemoteServer jvnRemoteServer : readServer.get(joi)) {
+				// @Todo : IRC problem  : JvnServerImpl:jvnInvalidateReader Error : Jvn objects not find in local server
 				jvnRemoteServer.jvnInvalidateReader(joi);
 			}
 
