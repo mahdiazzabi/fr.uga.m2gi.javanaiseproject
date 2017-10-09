@@ -12,6 +12,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.io.*;
+import java.util.HashMap;
 
 public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer, JvnRemoteServer {
 
@@ -19,7 +20,9 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	private static JvnServerImpl js = null;
 
 	// the remote reference of the JVNServer
-	private static JvnRemoteCoord jsCoord = null ; 
+	private static JvnRemoteCoord jsCoord = null ;
+
+	private HashMap<Integer, JvnObject> jvnObjects;
 	
 	/**
 	 * Default constructor
@@ -28,7 +31,9 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 **/
 	private JvnServerImpl() throws Exception {
 		super();
-		// to be completed
+
+		this.jvnObjects = new HashMap<Integer, JvnObject>();
+
 		try {
 			jsCoord = (JvnRemoteCoord) Naming.lookup("rmi://localhost:2049/refcoord");
 				
@@ -72,8 +77,13 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 * @throws JvnException
 	 **/
 	public JvnObject jvnCreateObject(Serializable o) throws jvn.JvnException {
-		JvnObjectImpl jvnObjectImpl = new JvnObjectImpl(o);
-		return jvnObjectImpl;
+		try {
+			JvnObjectImpl jvnObjectImpl = new JvnObjectImpl(o, jsCoord.jvnGetObjectId());
+
+			return jvnObjectImpl;
+		} catch (RemoteException e) {
+			throw new JvnException("JvnServerImpl:jvnCreateObject Error : " + e.getMessage());
+		}
 	}
 
 	/**
@@ -88,6 +98,7 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	public void jvnRegisterObject(String jon, JvnObject jo) throws jvn.JvnException {
 		try {
 			jsCoord.jvnRegisterObject(jon, jo, js);
+			jvnObjects.put(jo.jvnGetObjectId(), jo);
 			//JvnCoordImpl.getJvnCoordImpl().jvnRegisterObject(jon, jo, js);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
@@ -122,9 +133,11 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 * @throws JvnException
 	 **/
 	public Serializable jvnLockRead(int joi) throws JvnException {
-		// to be completed
-		return null;
-
+		try {
+			return jsCoord.jvnLockRead(joi, js);
+		} catch (RemoteException e) {
+			throw new JvnException("Error jvnLockRead : " + e.getMessage());
+		}
 	}
 
 	/**
@@ -162,8 +175,13 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 * @throws java.rmi.RemoteException,JvnException
 	 **/
 	public Serializable jvnInvalidateWriter(int joi) throws java.rmi.RemoteException, jvn.JvnException {
-		// to be completed
-		return null;
+		JvnObject object = jvnObjects.get(joi);
+
+		if (object == null) {
+			throw new JvnException("Jvn objects not find in local server");
+		}
+
+		return object.jvnInvalidateWriter();
 	};
 
 	/**
@@ -175,8 +193,13 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 * @throws java.rmi.RemoteException,JvnException
 	 **/
 	public Serializable jvnInvalidateWriterForReader(int joi) throws java.rmi.RemoteException, jvn.JvnException {
-		// to be completed
-		return null;
+		JvnObject object = jvnObjects.get(joi);
+
+		if (object == null) {
+			throw new JvnException("Jvn objects not find in local server");
+		}
+
+		return object.jvnInvalidateWriterForReader();
 	};
 
 }
