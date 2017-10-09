@@ -49,11 +49,12 @@ public class JvnObjectImpl implements JvnObject {
 
 			System.out.print("Operation LockWrite : initial state : "+ this.lock +" ");
 			if (this.lock == LockState.NL) {
-				// we will ask the coordinateur to take lock W and then this.setLock(LockState.WLT);
+				object = JvnServerImpl.jvnGetServer().jvnLockWrite(this.joi);
 				this.setLock(LockState.WLT);
 			} else {
 				this.setLock(LockState.WLT);
 			}
+
 			System.out.println("passed to : "+ this.lock );
 		}
 
