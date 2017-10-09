@@ -103,7 +103,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 **/
 	public synchronized void jvnRegisterObject(String jon, JvnObject jo, JvnRemoteServer js)
 		throws java.rmi.RemoteException, jvn.JvnException {
-		
+		System.out.println("JvnCoordImpl:jvnRegisterObject register object : " + jo.toString());
 		jvnObjects.put(jon, jo);
 		jvnReferences.put(jo.jvnGetObjectId(), jon);
 		jvnRemoteServers.put(jon, js);
@@ -134,6 +134,8 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 * @throws java.rmi.RemoteException,JvnException
 	 **/
 	public synchronized JvnObject jvnLookupObject(String jon, JvnRemoteServer js) throws java.rmi.RemoteException, jvn.JvnException {
+		System.out.println("JvnCoordImpl:jvnLookupObject return object : " + jon);
+
 		return jvnObjects.get(jon);
 	}
 

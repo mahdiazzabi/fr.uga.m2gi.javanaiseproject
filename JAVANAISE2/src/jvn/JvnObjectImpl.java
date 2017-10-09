@@ -6,7 +6,7 @@ public class JvnObjectImpl implements JvnObject {
 
 	int joi;
 	private Serializable object = null;
-	transient private LockState lock = LockState.NL;
+	private LockState lock = LockState.NL;
 
 	private enum LockState {
 		NL, // no local lock
@@ -134,7 +134,7 @@ public class JvnObjectImpl implements JvnObject {
 
 	public JvnObjectImpl setLock(LockState lock) {
 		this.lock = lock;
-		
+
 		return this;
 	}
 }
