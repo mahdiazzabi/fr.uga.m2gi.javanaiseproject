@@ -6,7 +6,7 @@ public class JvnObjectImpl implements JvnObject {
 
 	int joi;
 	private Serializable object = null;
-	private LockState lock = LockState.NL;
+	transient private LockState lock = LockState.NL;
 
 	private enum LockState {
 		NL, // no local lock
@@ -24,7 +24,11 @@ public class JvnObjectImpl implements JvnObject {
 	}
 
 	public void jvnLockRead() throws JvnException {
-		System.out.print("Operation LockRead : initial state : " + this.lock + " ");
+		if (this.lock == null) {
+			this.lock = LockState.NL;
+		}
+
+		System.out.println("Operation LockRead : initial state : " + this.lock + " ");
 
 		if (this.lock == LockState.NL) {
 			object = JvnServerImpl.jvnGetServer().jvnLockRead(this.joi);
@@ -41,6 +45,10 @@ public class JvnObjectImpl implements JvnObject {
 	}
 
 	public void jvnLockWrite() throws JvnException {
+		if (this.lock == null) {
+			this.lock = LockState.NL;
+		}
+		
 		System.out.println("Operation LockWrite : initial state : " + this.lock + " Object : " + joi);
 
 		if (this.lock == LockState.NL) {
