@@ -51,12 +51,17 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 **/
 	public static JvnServerImpl jvnGetServer() {
 		if (js == null) {
-			try {
-				js = new JvnServerImpl();
-			} catch (Exception e) {
-				return null;
+			synchronized (JvnServerImpl.class) {
+				if (js == null) {
+					try {
+						js = new JvnServerImpl();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
+
 		return js;
 	}
 
