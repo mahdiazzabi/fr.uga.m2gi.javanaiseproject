@@ -118,7 +118,6 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 			Naming.rebind("rmi://localhost:2049/refcoord", jvnCoord);
 			System.out.println("serveur coord en marche");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			System.out.println("serveur coord erreur :");
 			e.printStackTrace();
 		}

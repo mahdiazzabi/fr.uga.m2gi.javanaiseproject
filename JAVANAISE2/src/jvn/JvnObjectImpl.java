@@ -41,8 +41,8 @@ public class JvnObjectImpl implements JvnObject {
 	}
 
 	public void jvnLockWrite() throws JvnException {
-
 		System.out.println("Operation LockWrite : initial state : " + this.lock + " Object : " + joi);
+
 		if (this.lock == LockState.NL) {
 			object = JvnServerImpl.jvnGetServer().jvnLockWrite(this.joi);
 			this.setLock(LockState.WLT);
@@ -51,32 +51,30 @@ public class JvnObjectImpl implements JvnObject {
 		}
 
 		System.out.println("passed to : " + this.lock);
-
 	}
 
 	public void jvnUnLock() throws JvnException {
-
 		System.out.print("Unlock operation : initial lock :" + this.lock + " ");
 		switch (this.lock) {
-		case NL:
-			break;
-		case RLC:
-			this.setLock(LockState.NL);
-			break;
-		case WLC:
-			this.setLock(LockState.NL);
-			break;
-		case RLT:
-			this.setLock(LockState.RLC);
-			break;
-		case WLT:
-			this.setLock(LockState.WLC);
-			break;
-		case RLTWLC:
-			this.setLock(LockState.WLC);
-			break;
-		default:
-			throw new JvnException("jvnUnlock Error");
+			case NL:
+				break;
+			case RLC:
+				this.setLock(LockState.NL);
+				break;
+			case WLC:
+				this.setLock(LockState.NL);
+				break;
+			case RLT:
+				this.setLock(LockState.RLC);
+				break;
+			case WLT:
+				this.setLock(LockState.WLC);
+				break;
+			case RLTWLC:
+				this.setLock(LockState.WLC);
+				break;
+			default:
+				throw new JvnException("jvnUnlock Error");
 		}
 
 		System.out.println(" passed to :" + this.lock);
@@ -93,7 +91,6 @@ public class JvnObjectImpl implements JvnObject {
 	}
 
 	public void jvnInvalidateReader() throws JvnException {
-
 		while (this.lock == LockState.RLT) {
 			try {
 				wait();
@@ -101,11 +98,11 @@ public class JvnObjectImpl implements JvnObject {
 				e.printStackTrace();
 			}
 		}
+
 		jvnUnLock();
 	}
 
 	public Serializable jvnInvalidateWriter() throws JvnException {
-
 		while (this.lock == LockState.WLT) {
 			try {
 				wait();
@@ -113,7 +110,9 @@ public class JvnObjectImpl implements JvnObject {
 				e.printStackTrace();
 			}
 		}
+
 		jvnUnLock();
+
 		return this.object;
 	}
 
@@ -125,6 +124,7 @@ public class JvnObjectImpl implements JvnObject {
 				e.printStackTrace();
 			}
 		}
+
 		return this.object;
 	}
 
@@ -134,6 +134,7 @@ public class JvnObjectImpl implements JvnObject {
 
 	public JvnObjectImpl setLock(LockState lock) {
 		this.lock = lock;
+		
 		return this;
 	}
 }
