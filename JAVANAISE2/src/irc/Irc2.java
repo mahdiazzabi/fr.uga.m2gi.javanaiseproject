@@ -39,6 +39,8 @@ public class Irc2 {
 				jo.jvnUnLock();
 				js.jvnRegisterObject("IRC", jo);
 			}
+
+			System.out.println("Irc2:main jo : " + jo.jvnGetObjectId());
 			// create the graphical part of the Chat application
 			new Irc2(jo);
 
@@ -72,6 +74,7 @@ public class Irc2 {
 		frame.setSize(545, 201);
 		text.setBackground(Color.black);
 		frame.setVisible(true);
+		frame.setLocation(100, 200);
 	}
 }
 
