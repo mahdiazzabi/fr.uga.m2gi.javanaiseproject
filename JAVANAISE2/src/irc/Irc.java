@@ -72,6 +72,7 @@ public class Irc {
 		frame.setSize(545, 201);
 		text.setBackground(Color.black);
 		frame.setVisible(true);
+		frame.setLocation(0, 200);
 	}
 }
 

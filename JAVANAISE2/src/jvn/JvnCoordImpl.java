@@ -182,24 +182,31 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 *             JvnException
 	 **/
 	public synchronized Serializable jvnLockWrite(int joi, JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
+		System.out.println("");
+		System.out.println("==========================");
 		System.out.println("JvnCoordImpl:jvnLockWrite joi : " + joi);
-		Serializable object;
+		Serializable object = jvnObjects.get(jvnReferences.get(joi));
 
 		if (writeServer.containsKey(joi)) {
-			object = writeServer.get(joi).jvnInvalidateWriter(joi);
-		} else {
-			object = jvnObjects.get(jvnReferences.get(joi));
-		}
+			System.out.println("JvnCoordImpl:jvnLockWrite writeServer containsKey joi : " + joi);
 
-		System.out.println(readServer);
+			if (writeServer.get(joi) != js) {
+				object = writeServer.get(joi).jvnInvalidateWriter(joi);
+			}
+		}
 
 		for (JvnRemoteServer jvnRemoteServer : readServer.get(joi)) {
 			if (jvnRemoteServer != js) {
+				System.out.println("JvnCoordImpl:jvnLockWrite Try to invalidateReader for joi : " + joi);
 				jvnRemoteServer.jvnInvalidateReader(joi);
+				System.out.println("JvnCoordImpl:jvnLockWrite invalidateReader for joi : " + joi + " Ok");
 			}
 		}
 
 		writeServer.put(joi, js);
+
+		System.out.println("==========================");
+		System.out.println("");
 
 		return object;
 	}

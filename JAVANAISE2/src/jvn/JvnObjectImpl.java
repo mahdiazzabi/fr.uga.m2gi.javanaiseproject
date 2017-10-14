@@ -23,7 +23,7 @@ public class JvnObjectImpl implements JvnObject {
 		this.joi = joi;
 	}
 
-	public synchronized void jvnLockRead() throws JvnException {
+	public void jvnLockRead() throws JvnException {
 		if (this.lock == null) {
 			this.lock = LockState.NL;
 		}
@@ -31,7 +31,8 @@ public class JvnObjectImpl implements JvnObject {
 		System.out.println("Operation LockRead : initial state : " + this.lock + " ");
 
 		if (this.lock == LockState.NL) {
-			object = JvnServerImpl.jvnGetServer().jvnLockRead(this.joi);
+			this.object = JvnServerImpl.jvnGetServer().jvnLockRead(this.joi);
+
 			this.setLock(LockState.RLT);
 		} else if (this.lock == LockState.WLC) {
 			this.setLock(LockState.RLTWLC);
@@ -42,9 +43,10 @@ public class JvnObjectImpl implements JvnObject {
 		// nous gardons le verrous WLT car > RLT
 
 		System.out.println("passed to : " + this.lock);
+		System.out.println("==========================");
 	}
 
-	public synchronized void jvnLockWrite() throws JvnException {
+	public void jvnLockWrite() throws JvnException {
 		if (this.lock == null) {
 			this.lock = LockState.NL;
 		}
@@ -52,16 +54,19 @@ public class JvnObjectImpl implements JvnObject {
 		System.out.println("Operation LockWrite : initial state : " + this.lock + " Object : " + joi);
 
 		if (this.lock == LockState.NL || this.lock == LockState.RLC) {
-			object = JvnServerImpl.jvnGetServer().jvnLockWrite(this.joi);
+			this.object = JvnServerImpl.jvnGetServer().jvnLockWrite(this.joi);
 			this.setLock(LockState.WLT);
 		} else {
 			this.setLock(LockState.WLT);
 		}
 
 		System.out.println("passed to : " + this.lock);
+		System.out.println("==========================");
 	}
 
 	public synchronized void jvnUnLock() throws JvnException {
+		System.out.println("");
+		System.out.println("==========================");
 		System.out.print("Unlock operation : initial lock :" + this.lock + " ");
 		switch (this.lock) {
 			case NL:
@@ -85,9 +90,11 @@ public class JvnObjectImpl implements JvnObject {
 				throw new JvnException("jvnUnlock Error");
 		}
 
-		notify();
+		notifyAll();
 
 		System.out.println(" passed to :" + this.lock);
+		System.out.println("==========================");
+		System.out.println("");
 	}
 
 	public int jvnGetObjectId() throws JvnException {
@@ -95,7 +102,6 @@ public class JvnObjectImpl implements JvnObject {
 	}
 
 	public Serializable jvnGetObjectState() throws JvnException {
-		// TODO Auto-generated method stub
 		return this.object;
 	}
 
@@ -108,10 +114,11 @@ public class JvnObjectImpl implements JvnObject {
 			}
 		}
 
-		jvnUnLock();
+		this.jvnUnLock();
 	}
 
 	public synchronized Serializable jvnInvalidateWriter() throws JvnException {
+		System.out.println("JvnObjectImpl:jvnInvalidateWriter with initial lock : " + this.lock);
 		while (this.lock == LockState.WLT) {
 			try {
 				wait();
@@ -120,12 +127,13 @@ public class JvnObjectImpl implements JvnObject {
 			}
 		}
 
-		jvnUnLock();
+		this.jvnUnLock();
 
 		return this.object;
 	}
 
 	public synchronized Serializable jvnInvalidateWriterForReader() throws JvnException {
+		System.out.println("JvnObjectImpl:jvnInvalidateWriterForReader with initial lock : " + this.lock);
 		while (this.lock == LockState.WLT) {
 			try {
 				wait();
@@ -133,6 +141,8 @@ public class JvnObjectImpl implements JvnObject {
 				e.printStackTrace();
 			}
 		}
+
+		this.jvnUnLock();
 
 		return this.object;
 	}

@@ -74,7 +74,7 @@ public class Irc2 {
 		frame.setSize(545, 201);
 		text.setBackground(Color.black);
 		frame.setVisible(true);
-		frame.setLocation(100, 200);
+		frame.setLocation(800, 200);
 	}
 }
 
@@ -134,6 +134,7 @@ class writeListener2 implements ActionListener {
 
 			// invoke the method
 			((Sentence) (irc.sentence.jvnGetObjectState())).write(s);
+			System.out.println("IRC2 Write : " + s);
 
 			// unlock the object
 			irc.sentence.jvnUnLock();
