@@ -108,6 +108,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 		jvnReferences.put(jo.jvnGetObjectId(), jon);
 		jvnRemoteServers.put(jon, js);
 		writeServer.put(jo.jvnGetObjectId(), js);
+		readServer.put(jo.jvnGetObjectId(), new ArrayList<JvnRemoteServer>());
 	}
 
 	public static void main(String argv[]) {
@@ -164,11 +165,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 			object = jvnObjects.get(jvnReferences.get(joi));
 		}
 
-		if (!readServer.containsKey(joi)) {
-			readServer.put(joi, new ArrayList<JvnRemoteServer>(){{add(js);}});
-		} else {
-			readServer.get(joi).add(js);
-		}
+		readServer.get(joi).add(js);
 
 		return object;
 	}
@@ -191,13 +188,15 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 		if (writeServer.containsKey(joi)) {
 			object = writeServer.get(joi).jvnInvalidateWriter(joi);
 		} else {
+			object = jvnObjects.get(jvnReferences.get(joi));
+		}
 
-			for (JvnRemoteServer jvnRemoteServer : readServer.get(joi)) {
-				// @Todo : IRC problem  : JvnServerImpl:jvnInvalidateReader Error : Jvn objects not find in local server
+		System.out.println(readServer);
+
+		for (JvnRemoteServer jvnRemoteServer : readServer.get(joi)) {
+			if (jvnRemoteServer != js) {
 				jvnRemoteServer.jvnInvalidateReader(joi);
 			}
-
-			object = jvnObjects.get(jvnReferences.get(joi));
 		}
 
 		writeServer.put(joi, js);
