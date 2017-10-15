@@ -38,11 +38,11 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	/**
 	 * Link id of jvnObjects tooked in write lock with JvnRemoteServer associated
 	 */
-	private HashMap<Integer, JvnRemoteServer> writeServer;
+	private HashMap<Integer, JvnRemoteServer> jvnWriteServers;
 	/**
 	 * Link id of jvnObjects tooked in read lock with JvnRemoteServer associated
 	 */
-	private HashMap<Integer, ArrayList<JvnRemoteServer>> readServer;
+	private HashMap<Integer, ArrayList<JvnRemoteServer>> jvnReadServers;
 
 	private int id;
 
@@ -56,9 +56,8 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 
 		this.jvnObjects = new HashMap<String, JvnObject>();
 		this.jvnReferences = new HashMap<Integer, String>();
-		this.jvnRemoteServers = new HashMap<String, JvnRemoteServer>();
-		this.writeServer = new HashMap<Integer, JvnRemoteServer>();
-		this.readServer = new HashMap<Integer, ArrayList<JvnRemoteServer>>();
+		this.jvnWriteServers = new HashMap<Integer, JvnRemoteServer>();
+		this.jvnReadServers = new HashMap<Integer, ArrayList<JvnRemoteServer>>();
 		this.id = 0;
 	}
 
@@ -103,12 +102,18 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 **/
 	public synchronized void jvnRegisterObject(String jon, JvnObject jo, JvnRemoteServer js)
 		throws java.rmi.RemoteException, jvn.JvnException {
+		System.out.println("");
+		System.out.println("==========================");
+		System.out.println("JvnCoordImpl:jvnLockRead");
 		System.out.println("JvnCoordImpl:jvnRegisterObject register object : " + jo.toString());
+
 		jvnObjects.put(jon, jo);
 		jvnReferences.put(jo.jvnGetObjectId(), jon);
-		jvnRemoteServers.put(jon, js);
-		writeServer.put(jo.jvnGetObjectId(), js);
-		readServer.put(jo.jvnGetObjectId(), new ArrayList<JvnRemoteServer>());
+		jvnWriteServers.put(jo.jvnGetObjectId(), js);
+		jvnReadServers.put(jo.jvnGetObjectId(), new ArrayList<JvnRemoteServer>());
+
+		System.out.println("==========================");
+		System.out.println("");
 	}
 
 	public static void main(String argv[]) {
@@ -152,20 +157,22 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 *             JvnException
 	 **/
 	public synchronized Serializable jvnLockRead(int joi, JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
+		System.out.println("");
+		System.out.println("==========================");
 		System.out.println("JvnCoordImpl:jvnLockRead");
-		Serializable object;
 
-		if (writeServer.containsKey(joi)) {
+		Serializable object = jvnObjects.get(jvnReferences.get(joi)).jvnGetObjectState();
+
+		if (jvnWriteServers.containsKey(joi) && !jvnWriteServers.get(joi).equals(js)) {
 			System.out.println("Write server has write lock on object " + joi);
-			object = writeServer.get(joi).jvnInvalidateWriterForReader(joi);
-			writeServer.remove(joi);
-		} else {
-			System.out.println("Write server has not write lock on object " + joi);
-
-			object = jvnObjects.get(jvnReferences.get(joi));
+			object = jvnWriteServers.get(joi).jvnInvalidateWriterForReader(joi);
+			jvnWriteServers.remove(joi);
 		}
 
-		readServer.get(joi).add(js);
+		jvnReadServers.get(joi).add(js);
+
+		System.out.println("==========================");
+		System.out.println("");
 
 		return object;
 	}
@@ -185,25 +192,24 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 		System.out.println("");
 		System.out.println("==========================");
 		System.out.println("JvnCoordImpl:jvnLockWrite joi : " + joi);
-		Serializable object = jvnObjects.get(jvnReferences.get(joi));
+		Serializable object = jvnObjects.get(jvnReferences.get(joi)).jvnGetObjectState();
 
-		if (writeServer.containsKey(joi)) {
-			System.out.println("JvnCoordImpl:jvnLockWrite writeServer containsKey joi : " + joi);
+		if (jvnWriteServers.containsKey(joi) && jvnWriteServers.get(joi) != js) {
+			System.out.println("JvnCoordImpl:jvnLockWrite jvnWriteServers containsKey joi : " + joi);
 
-			if (writeServer.get(joi) != js) {
-				object = writeServer.get(joi).jvnInvalidateWriter(joi);
-			}
+			object = jvnWriteServers.get(joi).jvnInvalidateWriter(joi);
 		}
 
-		for (JvnRemoteServer jvnRemoteServer : readServer.get(joi)) {
-			if (jvnRemoteServer != js) {
-				System.out.println("JvnCoordImpl:jvnLockWrite Try to invalidateReader for joi : " + joi);
-				jvnRemoteServer.jvnInvalidateReader(joi);
+		for (int i = 0; i < jvnReadServers.get(joi).size(); i++) {
+			if (!jvnReadServers.get(joi).get(i).equals(js)) {
+				System.out.println("JvnCoordImpl:jvnLockWrite try to invalidateReader for joi : " + joi);
+				jvnReadServers.get(joi).get(i).jvnInvalidateReader(joi);
+				jvnReadServers.get(joi).remove(i);
 				System.out.println("JvnCoordImpl:jvnLockWrite invalidateReader for joi : " + joi + " Ok");
 			}
 		}
 
-		writeServer.put(joi, js);
+		jvnWriteServers.put(joi, js);
 
 		System.out.println("==========================");
 		System.out.println("");
