@@ -170,6 +170,8 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 		}
 
 		jvnReadServers.get(joi).add(js);
+		// One server must have write lock
+		jvnWriteServers.put(joi, js);
 
 		System.out.println("==========================");
 		System.out.println("");
