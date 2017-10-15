@@ -39,10 +39,8 @@ public class Irc2 {
 				jo.jvnUnLock();
 				js.jvnRegisterObject("IRC", jo);
 			}
-
-			System.out.println("Irc2:main jo : " + jo.jvnGetObjectId());
 			// create the graphical part of the Chat application
-			new Irc2(jo);
+			new Irc(jo);
 
 		} catch (Exception e) {
 			System.out.println("IRC problem : " + e.getMessage());
@@ -65,6 +63,9 @@ public class Irc2 {
 		frame.add(text);
 		data = new TextField(40);
 		frame.add(data);
+		Button unlock_button = new Button("Unlock");
+		unlock_button.addActionListener(new unlockListener2(this));
+		frame.add(unlock_button);
 		Button read_button = new Button("read");
 		read_button.addActionListener(new readListener2(this));
 		frame.add(read_button);
@@ -74,10 +75,33 @@ public class Irc2 {
 		frame.setSize(545, 201);
 		text.setBackground(Color.black);
 		frame.setVisible(true);
-		frame.setLocation(800, 200);
+		frame.setLocation(0, 200);
 	}
 }
+/**
+ * Internal class to manage user events (read) on the CHAT application
+ **/
+class unlockListener2 implements ActionListener {
+	Irc2 irc;
 
+	public unlockListener2(Irc2 irc2) {
+		irc = irc2;
+	}
+
+	/**
+	 * Management of user events
+	 **/
+	public void actionPerformed(ActionEvent e) {
+		try {
+		
+			irc.sentence.jvnUnLock();
+
+		
+		} catch (JvnException je) {
+			System.out.println("IRC problem : " + je.getMessage());
+		}
+	}
+}
 /**
  * Internal class to manage user events (read) on the CHAT application
  **/
@@ -100,7 +124,7 @@ class readListener2 implements ActionListener {
 			String s = ((Sentence) (irc.sentence.jvnGetObjectState())).read();
 
 			// unlock the object
-			irc.sentence.jvnUnLock();
+			//irc.sentence.jvnUnLock();
 
 			// display the read value
 			irc.data.setText(s);
@@ -134,10 +158,9 @@ class writeListener2 implements ActionListener {
 
 			// invoke the method
 			((Sentence) (irc.sentence.jvnGetObjectState())).write(s);
-			System.out.println("IRC2 Write : " + s);
 
 			// unlock the object
-			irc.sentence.jvnUnLock();
+			//irc.sentence.jvnUnLock();
 		} catch (JvnException je) {
 			System.out.println("IRC problem  : " + je.getMessage());
 		}

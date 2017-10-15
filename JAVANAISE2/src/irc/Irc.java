@@ -63,6 +63,9 @@ public class Irc {
 		frame.add(text);
 		data = new TextField(40);
 		frame.add(data);
+		Button unlock_button = new Button("Unlock");
+		unlock_button.addActionListener(new unlockListener(this));
+		frame.add(unlock_button);
 		Button read_button = new Button("read");
 		read_button.addActionListener(new readListener(this));
 		frame.add(read_button);
@@ -75,7 +78,30 @@ public class Irc {
 		frame.setLocation(0, 200);
 	}
 }
+/**
+ * Internal class to manage user events (read) on the CHAT application
+ **/
+class unlockListener implements ActionListener {
+	Irc irc;
 
+	public unlockListener(Irc i) {
+		irc = i;
+	}
+
+	/**
+	 * Management of user events
+	 **/
+	public void actionPerformed(ActionEvent e) {
+		try {
+		
+			irc.sentence.jvnUnLock();
+
+		
+		} catch (JvnException je) {
+			System.out.println("IRC problem : " + je.getMessage());
+		}
+	}
+}
 /**
  * Internal class to manage user events (read) on the CHAT application
  **/
@@ -98,7 +124,7 @@ class readListener implements ActionListener {
 			String s = ((Sentence) (irc.sentence.jvnGetObjectState())).read();
 
 			// unlock the object
-			irc.sentence.jvnUnLock();
+			//irc.sentence.jvnUnLock();
 
 			// display the read value
 			irc.data.setText(s);
@@ -134,7 +160,7 @@ class writeListener implements ActionListener {
 			((Sentence) (irc.sentence.jvnGetObjectState())).write(s);
 
 			// unlock the object
-			irc.sentence.jvnUnLock();
+			//irc.sentence.jvnUnLock();
 		} catch (JvnException je) {
 			System.out.println("IRC problem  : " + je.getMessage());
 		}
