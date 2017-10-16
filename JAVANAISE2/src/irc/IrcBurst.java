@@ -41,11 +41,8 @@ public class IrcBurst {
 			int valeur = r.nextInt(2);
 			while (true) {
 				if (valeur == 0) {
-					int timer = 1000000;
 					jo.jvnLockRead();
-					while (timer > 500000) {
-						timer--;
-					}
+					
 				} else {
 					jo.jvnLockWrite();
 					((Sentence) (jo.jvnGetObjectState())).write("burst");
