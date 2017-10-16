@@ -42,7 +42,7 @@ public class IrcBurst {
 			while (true) {
 				if (valeur == 0) {
 					jo.jvnLockRead();
-					
+					jo.jvnUnLock();
 				} else {
 					jo.jvnLockWrite();
 					((Sentence) (jo.jvnGetObjectState())).write("burst");
