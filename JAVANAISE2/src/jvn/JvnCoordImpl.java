@@ -156,7 +156,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 * @throws java.rmi.RemoteException,
 	 *             JvnException
 	 **/
-	public synchronized Serializable jvnLockRead(int joi, JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
+	public Serializable jvnLockRead(int joi, JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
 		System.out.println("");
 		System.out.println("==========================");
 		System.out.println("JvnCoordImpl:jvnLockRead");
@@ -164,10 +164,12 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 		Serializable object = jvnObjects.get(jvnReferences.get(joi)).jvnGetObjectState();
 
 		if (jvnWriteServers.containsKey(joi) && !jvnWriteServers.get(joi).equals(js)) {
-			System.out.println("Write server has write lock on object " + joi);
-			object = jvnWriteServers.get(joi).jvnInvalidateWriterForReader(joi);
-			jvnWriteServers.remove(joi);
-			jvnObjects.get(jvnReferences.get(joi)).updateObject(object);
+			synchronized (this) {
+				System.out.println("Write server has write lock on object " + joi);
+				object = jvnWriteServers.get(joi).jvnInvalidateWriterForReader(joi);
+				jvnWriteServers.remove(joi);
+				jvnObjects.get(jvnReferences.get(joi)).updateObject(object);
+			}
 		}
 
 		jvnReadServers.get(joi).add(js);
@@ -189,18 +191,20 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 * @throws java.rmi.RemoteException,
 	 *             JvnException
 	 **/
-	public synchronized Serializable jvnLockWrite(int joi, JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
+	public Serializable jvnLockWrite(int joi, JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
 		System.out.println("");
 		System.out.println("==========================");
 		System.out.println("JvnCoordImpl:jvnLockWrite joi : " + joi);
 		Serializable object = jvnObjects.get(jvnReferences.get(joi)).jvnGetObjectState();
 
 		if (jvnWriteServers.containsKey(joi) && jvnWriteServers.get(joi) != js) {
-			System.out.println("JvnCoordImpl:jvnLockWrite jvnWriteServers containsKey joi : " + joi);
+			synchronized (this) {
+				System.out.println("JvnCoordImpl:jvnLockWrite jvnWriteServers containsKey joi : " + joi);
 
-			object = jvnWriteServers.get(joi).jvnInvalidateWriter(joi);
+				object = jvnWriteServers.get(joi).jvnInvalidateWriter(joi);
 
-			jvnObjects.get(jvnReferences.get(joi)).updateObject(object);
+				jvnObjects.get(jvnReferences.get(joi)).updateObject(object);
+			}
 		}
 
 		for (int i = 0; i < jvnReadServers.get(joi).size(); i++) {
