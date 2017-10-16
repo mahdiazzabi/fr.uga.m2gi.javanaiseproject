@@ -18,7 +18,7 @@ public class Irc {
 	public TextField data;
 	Frame frame;
 	JvnObject sentence;
-
+	static JvnServerImpl js;
 	/**
 	 * main method create a JVN object nammed IRC for representing the Chat
 	 * application
@@ -27,7 +27,7 @@ public class Irc {
 		try {
 
 			// initialize JVN
-			JvnServerImpl js = JvnServerImpl.jvnGetServer();
+			js = JvnServerImpl.jvnGetServer();
 
 			// look up the IRC object in the JVN server
 			// if not found, create it, and register it in the JVN server
@@ -76,8 +76,23 @@ public class Irc {
 		text.setBackground(Color.black);
 		frame.setVisible(true);
 		frame.setLocation(0, 200);
+		frame.addWindowListener( new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent we) {
+            	try {
+					js.jvnTerminate();
+					jo.jvnUnLock();
+	                System.exit(0);
+				} catch (JvnException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+        } );
+		
 	}
 }
+
 /**
  * Internal class to manage user events (read) on the CHAT application
  **/
@@ -95,7 +110,7 @@ class unlockListener implements ActionListener {
 		try {
 		
 			irc.sentence.jvnUnLock();
-
+			
 		
 		} catch (JvnException je) {
 			System.out.println("IRC problem : " + je.getMessage());

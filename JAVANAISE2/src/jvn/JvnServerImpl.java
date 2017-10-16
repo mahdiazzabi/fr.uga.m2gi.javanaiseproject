@@ -71,7 +71,12 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 * @throws JvnException
 	 **/
 	public void jvnTerminate() throws jvn.JvnException {
-		// to be completed
+		try {
+			jsCoord.jvnTerminate(this);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**

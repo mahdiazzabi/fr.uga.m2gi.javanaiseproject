@@ -233,7 +233,19 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 *             JvnException
 	 **/
 	public synchronized void jvnTerminate(JvnRemoteServer js) throws java.rmi.RemoteException, JvnException {
-		// to be completed
+		for (int i = 0; i < jvnWriteServers.size(); i++) {
+			if (jvnWriteServers.get(i).equals(js)) {
+				jvnWriteServers.remove(i);
+			}
+		}
+		for (int i = 0; i < jvnReadServers.size(); i++) {
+			for (JvnRemoteServer jvns : jvnReadServers.get(i)) {
+				if (jvns.equals(js)) {
+					jvnReadServers.get(i).remove(js);
+				}
+			}	
+		}
+		
 	}
 
 	public HashMap<String, JvnObject> getJvnObjects() {
