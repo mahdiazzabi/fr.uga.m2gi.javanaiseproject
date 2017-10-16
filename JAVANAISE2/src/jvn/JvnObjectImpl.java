@@ -156,4 +156,10 @@ public class JvnObjectImpl implements JvnObject {
 
 		return this;
 	}
+
+	public JvnObject updateObject(Serializable object) throws JvnException {
+		this.object = object;
+
+		return this;
+	}
 }

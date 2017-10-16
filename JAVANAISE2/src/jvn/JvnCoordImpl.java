@@ -167,11 +167,10 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 			System.out.println("Write server has write lock on object " + joi);
 			object = jvnWriteServers.get(joi).jvnInvalidateWriterForReader(joi);
 			jvnWriteServers.remove(joi);
+			jvnObjects.get(jvnReferences.get(joi)).updateObject(object);
 		}
 
 		jvnReadServers.get(joi).add(js);
-		// One server must have write lock
-		jvnWriteServers.put(joi, js);
 
 		System.out.println("==========================");
 		System.out.println("");
@@ -200,6 +199,8 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 			System.out.println("JvnCoordImpl:jvnLockWrite jvnWriteServers containsKey joi : " + joi);
 
 			object = jvnWriteServers.get(joi).jvnInvalidateWriter(joi);
+
+			jvnObjects.get(jvnReferences.get(joi)).updateObject(object);
 		}
 
 		for (int i = 0; i < jvnReadServers.get(joi).size(); i++) {
