@@ -38,8 +38,8 @@ public class IrcBurst {
 			}
 
 			Random r = new Random();
-			int valeur = r.nextInt(2);
 			while (true) {
+				int valeur = r.nextInt(2);
 				if (valeur == 0) {
 					jo.jvnLockRead();
 					jo.jvnUnLock();
