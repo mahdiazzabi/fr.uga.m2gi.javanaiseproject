@@ -15,53 +15,30 @@ import java.io.*;
 import java.util.Random;
 
 public class IrcBurst {
-	static JvnObject sentence;
 
-	/**
-	 * main method create a JVN object nammed IRC for representing the Chat
-	 * application
-	 **/
+	SentenceInterface sentence;
+
 	public static void main(String argv[]) {
+
 		try {
-			// initialize JVN
-			JvnServerImpl js = JvnServerImpl.jvnGetServer();
-
-			// look up the IRC object in the JVN server
-			// if not found, create it, and register it in the JVN server
-			JvnObject jo = js.jvnLookupObject("IRC");
-
-			if (jo == null) {
-				jo = js.jvnCreateObject((Serializable) new Sentence());
-				// after creation, I have a write lock on the object
-				jo.jvnUnLock();
-				js.jvnRegisterObject("IRC", jo);
-			}
+			SentenceInterface sentence = (SentenceInterface) SentenceInvocationHandler.createProxyInstance("IRC");
 
 			Random r = new Random();
 			while (true) {
 				int valeur = r.nextInt(2);
 				if (valeur == 0) {
-					jo.jvnLockRead();
-					jo.jvnUnLock();
+					sentence.read();
 				} else {
-					jo.jvnLockWrite();
-					((Sentence) (jo.jvnGetObjectState())).write("burst");
-					jo.jvnUnLock();
+					sentence.write("ForBurst");
 				}
 
 			}
 
-		} catch (Exception e) {
-			System.out.println("IRC problem : " + e.getMessage());
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
+
 	}
 
-	/**
-	 * IRC Constructor
-	 * 
-	 * @param jo
-	 *            the JVN object representing the Chat
-	 **/
-	public IrcBurst(JvnObject jo) {
-	}
 }
