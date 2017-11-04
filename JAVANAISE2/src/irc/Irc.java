@@ -26,7 +26,7 @@ public class Irc {
 
 		try {
 
-			SentenceInterface sentence = (SentenceInterface) JvnObjectInvocationHandler.createProxyInstance("IRC");
+			SentenceInterface sentence = (SentenceInterface) SentenceInvocationHandler.createProxyInstance("IRC");
 
 			// create the graphical part of the Chat application
 			new Irc(sentence);

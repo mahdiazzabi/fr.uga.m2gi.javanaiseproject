@@ -10,11 +10,11 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-public class JvnObjectInvocationHandler implements InvocationHandler, Serializable {
+public class SentenceInvocationHandler implements InvocationHandler, Serializable {
 
     private JvnObject jvnObject;
 
-    private JvnObjectInvocationHandler(String jon) throws JvnException {
+    private SentenceInvocationHandler(String jon) throws JvnException {
         try {
             JvnServerImpl js = JvnServerImpl.jvnGetServer();
             this.jvnObject = js.jvnLookupObject(jon);
@@ -35,7 +35,7 @@ public class JvnObjectInvocationHandler implements InvocationHandler, Serializab
         return (SentenceInterface) Proxy.newProxyInstance(
                 SentenceInterface.class.getClassLoader(),
                 new Class[] {SentenceInterface.class},
-                new JvnObjectInvocationHandler(jon)
+                new SentenceInvocationHandler(jon)
         );
     }
 
@@ -45,23 +45,16 @@ public class JvnObjectInvocationHandler implements InvocationHandler, Serializab
         if (method.isAnnotationPresent(Read.class)) {
 
             this.jvnObject.jvnLockRead();
-
-            String message = ((Sentence) (this.jvnObject.jvnGetObjectState())).read();
-
-            this.jvnObject.jvnUnLock();
-
-            return message;
         }
 
         if (method.isAnnotationPresent(Write.class)) {
             this.jvnObject.jvnLockWrite();
-
-            ((Sentence) (this.jvnObject.jvnGetObjectState())).write((String) args[0]);
-
-            this.jvnObject.jvnUnLock();
         }
 
+        Object invokeResult = method.invoke(this.jvnObject.jvnGetObjectState(), args);
 
-        return this.jvnObject;
+        this.jvnObject.jvnUnLock();
+
+        return invokeResult;
     }
 }
