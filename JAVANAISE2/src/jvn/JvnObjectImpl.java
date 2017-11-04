@@ -1,6 +1,5 @@
 package jvn;
 
-import annotation.Read;
 
 import java.io.Serializable;
 
