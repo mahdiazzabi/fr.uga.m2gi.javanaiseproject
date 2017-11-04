@@ -1,8 +1,7 @@
 package jvn;
 
-import annotation.Read;
-import annotation.Terminate;
-import annotation.Write;
+import annotation.JvnMessage;
+import annotation.JvnTerminate;
 import irc.Sentence;
 import irc.SentenceInterface;
 
@@ -44,16 +43,20 @@ public class SentenceInvocationHandler implements InvocationHandler, Serializabl
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        if (method.isAnnotationPresent(Read.class)) {
+        if (method.isAnnotationPresent(JvnMessage.class) &&
+                method.getAnnotation(JvnMessage.class).methodeType() == JvnMessage.MethodType.READ
+        ) {
 
             this.jvnObject.jvnLockRead();
         }
 
-        if (method.isAnnotationPresent(Write.class)) {
+        if (method.isAnnotationPresent(JvnMessage.class) &&
+                method.getAnnotation(JvnMessage.class).methodeType() == JvnMessage.MethodType.WRITE
+        ) {
             this.jvnObject.jvnLockWrite();
         }
 
-        if (method.isAnnotationPresent(Terminate.class)) {
+        if (method.isAnnotationPresent(JvnTerminate.class)) {
             this.jvnObject.jvnUnLock();
             this.jvnServer.jvnTerminate();
         }
