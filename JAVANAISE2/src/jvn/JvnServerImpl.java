@@ -88,10 +88,11 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 **/
 	public JvnObject jvnCreateObject(Serializable o) throws jvn.JvnException {
 		try {
+
 			JvnObjectImpl jvnObjectImpl = new JvnObjectImpl(o, jsCoord.jvnGetObjectId());
 
 			return jvnObjectImpl;
-		} catch (RemoteException e) {
+		} catch (Exception e) {
 			throw new JvnException("JvnServerImpl:jvnCreateObject Error : " + e.getMessage());
 		}
 	}

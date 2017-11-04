@@ -1,5 +1,7 @@
 package jvn;
 
+import annotation.Read;
+
 import java.io.Serializable;
 
 public class JvnObjectImpl implements JvnObject {

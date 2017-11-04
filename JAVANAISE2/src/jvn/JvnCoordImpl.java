@@ -105,7 +105,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 		System.out.println("");
 		System.out.println("==========================");
 		System.out.println("JvnCoordImpl:jvnLockRead");
-		System.out.println("JvnCoordImpl:jvnRegisterObject register object : " + jo.toString());
+		System.out.println("JvnCoordImpl:jvnRegisterObject register object : " + jon);
 
 		jvnObjects.put(jon, jo);
 		jvnReferences.put(jo.jvnGetObjectId(), jon);
