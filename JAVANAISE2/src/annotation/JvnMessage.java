@@ -7,5 +7,11 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Read {
+public @interface JvnMessage {
+    static enum MethodType {
+        READ,
+        WRITE
+    }
+
+    MethodType methodeType();
 }

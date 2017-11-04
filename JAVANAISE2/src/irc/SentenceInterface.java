@@ -1,13 +1,15 @@
 package irc;
 
-import annotation.Read;
-import annotation.Write;
+
+import annotation.JvnMessage;
+import annotation.JvnTerminate;
 
 public interface SentenceInterface {
-    @Write
+    @JvnMessage(methodeType = JvnMessage.MethodType.WRITE)
     public void write(String text);
-    @Read
+    @JvnMessage(methodeType = JvnMessage.MethodType.READ)
     public String read();
+    @JvnTerminate
     public void terminate();
 
     public int getId();
