@@ -66,14 +66,14 @@ public class Irc {
 		frame.addWindowListener( new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent we) {
-//			try {
-//				js.jvnTerminate();
-//				sentence.jvnUnLock();
-//				System.exit(0);
-//			} catch (JvnException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
+			try {
+				sentence.terminate();
+
+				System.exit(0);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             }
         } );
 		

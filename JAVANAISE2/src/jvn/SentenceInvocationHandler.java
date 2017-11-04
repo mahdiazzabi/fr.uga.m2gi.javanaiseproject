@@ -1,6 +1,7 @@
 package jvn;
 
 import annotation.Read;
+import annotation.Terminate;
 import annotation.Write;
 import irc.Sentence;
 import irc.SentenceInterface;
@@ -13,17 +14,18 @@ import java.lang.reflect.Proxy;
 public class SentenceInvocationHandler implements InvocationHandler, Serializable {
 
     private JvnObject jvnObject;
+    private JvnServerImpl jvnServer;
 
     private SentenceInvocationHandler(String jon) throws JvnException {
         try {
-            JvnServerImpl js = JvnServerImpl.jvnGetServer();
-            this.jvnObject = js.jvnLookupObject(jon);
+            this.jvnServer = JvnServerImpl.jvnGetServer();
+            this.jvnObject = this.jvnServer.jvnLookupObject(jon);
 
             if (this.jvnObject == null) {
-                this.jvnObject = js.jvnCreateObject((Serializable) new Sentence());
+                this.jvnObject = this.jvnServer.jvnCreateObject((Serializable) new Sentence());
                 this.jvnObject.jvnUnLock();
 
-                js.jvnRegisterObject(jon, this.jvnObject);
+                this.jvnServer.jvnRegisterObject(jon, this.jvnObject);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -49,6 +51,11 @@ public class SentenceInvocationHandler implements InvocationHandler, Serializabl
 
         if (method.isAnnotationPresent(Write.class)) {
             this.jvnObject.jvnLockWrite();
+        }
+
+        if (method.isAnnotationPresent(Terminate.class)) {
+            this.jvnObject.jvnUnLock();
+            this.jvnServer.jvnTerminate();
         }
 
         Object invokeResult = method.invoke(this.jvnObject.jvnGetObjectState(), args);

@@ -24,6 +24,10 @@ public class Sentence implements SentenceInterface, java.io.Serializable {
 		return data;
 	}
 
+	public void terminate() {
+		System.out.println("Terminate");
+	}
+
 	public int getId() {
 		return id;
 	}
