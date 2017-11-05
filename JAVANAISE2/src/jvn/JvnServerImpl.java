@@ -8,6 +8,7 @@
 
 package jvn;
 
+import java.rmi.ConnectException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -20,10 +21,10 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	private static JvnServerImpl js = null;
 
 	// the remote reference of the JVNServer
-	private static JvnRemoteCoord jsCoord = null ;
+	private static JvnRemoteCoord jsCoord = null;
 
 	private HashMap<Integer, JvnObject> jvnObjects;
-	
+
 	/**
 	 * Default constructor
 	 * 
@@ -34,13 +35,19 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 
 		this.jvnObjects = new HashMap<Integer, JvnObject>();
 
+		while (!connectToCordinator()) {
+			System.err.println("Connection Lost trying to reconnect ...");
+		}
+
+	}
+
+	private Boolean connectToCordinator() {
 		try {
 			jsCoord = (JvnRemoteCoord) Naming.lookup("rmi://localhost:2049/refcoord");
-				
+			return true;
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			return false;
 		}
-		
 	}
 
 	/**
@@ -73,6 +80,11 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	public void jvnTerminate() throws jvn.JvnException {
 		try {
 			jsCoord.jvnTerminate(this);
+		} catch (ConnectException ex) {
+			while (!connectToCordinator()) {
+				System.err.println("Connection Lost trying to reconnect ...");
+			}
+			jvnTerminate();
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -90,8 +102,12 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 		try {
 
 			JvnObjectImpl jvnObjectImpl = new JvnObjectImpl(o, jsCoord.jvnGetObjectId());
-
 			return jvnObjectImpl;
+		} catch (ConnectException ex) {
+			while (!connectToCordinator()) {
+				System.err.println("Connection Lost trying to reconnect ...");
+			}
+			return jvnCreateObject(o);
 		} catch (Exception e) {
 			throw new JvnException("JvnServerImpl:jvnCreateObject Error : " + e.getMessage());
 		}
@@ -112,6 +128,11 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 			jvnObjects.put(jo.jvnGetObjectId(), jo);
 
 			System.out.println("JvnServerImpl:jvnRegisterObject : jo " + jo.jvnGetObjectId() + " resgistered");
+		} catch (ConnectException ex) {
+			while (!connectToCordinator()) {
+				System.err.println("Connection Lost trying to reconnect ...");
+			}
+			jvnRegisterObject(jon, jo);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -128,13 +149,18 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	 **/
 	public JvnObject jvnLookupObject(String jon) throws jvn.JvnException {
 		try {
-			JvnObject object =  jsCoord.jvnLookupObject(jon, this);
+			JvnObject object = jsCoord.jvnLookupObject(jon, this);
 
 			if (object != null) {
 				jvnObjects.put(object.jvnGetObjectId(), object);
 			}
 
 			return object;
+		} catch (ConnectException ex) {
+			while (!connectToCordinator()) {
+				System.err.println("Connection Lost trying to reconnect ...");
+			}
+			return jvnLookupObject(jon);
 		} catch (RemoteException e) {
 			throw new JvnException("jvnLookupObject Error");
 		}
@@ -151,6 +177,11 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	public Serializable jvnLockRead(int joi) throws JvnException {
 		try {
 			return jsCoord.jvnLockRead(joi, js);
+		} catch (ConnectException ex) {
+			while (!connectToCordinator()) {
+				System.err.println("Connection Lost trying to reconnect ...");
+			}
+			return jvnLockRead(joi);
 		} catch (RemoteException e) {
 			throw new JvnException("Error jvnLockRead : " + e.getMessage());
 		}
@@ -167,8 +198,12 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 	public Serializable jvnLockWrite(int joi) throws JvnException {
 		try {
 			System.out.println("JvnServImpl:jvnLockWrite object : " + joi);
-
 			return jsCoord.jvnLockWrite(joi, js);
+		} catch (ConnectException ex) {
+			while (!connectToCordinator()) {
+				System.err.println("Connection Lost trying to reconnect ...");
+			}
+			return jvnLockWrite(joi);
 		} catch (RemoteException e) {
 			throw new JvnException("Error jvnLockWrite : " + e.getMessage());
 		}
@@ -187,7 +222,8 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 		JvnObject object = jvnObjects.get(joi);
 
 		if (object == null) {
-			throw new JvnException("JvnServerImpl:jvnInvalidateReader Error : Jvn objects not find in local server joi " + joi);
+			throw new JvnException(
+					"JvnServerImpl:jvnInvalidateReader Error : Jvn objects not find in local server joi " + joi);
 		}
 
 		try {
@@ -209,7 +245,8 @@ public class JvnServerImpl extends UnicastRemoteObject implements JvnLocalServer
 		JvnObject object = jvnObjects.get(joi);
 
 		if (object == null) {
-			throw new JvnException("JvnServerImpl:jvnInvalidateWriter Error :Jvn objects not find in local server joi " + joi);
+			throw new JvnException(
+					"JvnServerImpl:jvnInvalidateWriter Error :Jvn objects not find in local server joi " + joi);
 		}
 
 		return object.jvnInvalidateWriter();
