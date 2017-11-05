@@ -34,10 +34,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	 * Jvn objects
 	 */
 	private HashMap<String, JvnObject> jvnObjects = new HashMap<>();
-	/**
-	 * Jvn remote servers
-	 */
-	private HashMap<String, JvnRemoteServer> jvnRemoteServers = new HashMap<>();
+	
 	/**
 	 * Link name and id of jvnObjects
 	 */
@@ -71,10 +68,6 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 			ois = new ObjectInputStream(fin);
 			jvnObjects = (HashMap<String, JvnObject>) ois.readObject();
 			
-			fin = new FileInputStream("jvnRemoteServers.ser");
-			ois = new ObjectInputStream(fin);
-			jvnRemoteServers = (HashMap<String, JvnRemoteServer>) ois.readObject();
-			
 			fin = new FileInputStream("jvnReferences.ser");
 			ois = new ObjectInputStream(fin);
 			jvnReferences = (HashMap<Integer, String>) ois.readObject();
@@ -93,7 +86,6 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 			}
 		} catch (FileNotFoundException e) {
 			serializeFilesState(jvnObjects, "jvnObjects.ser");
-			serializeFilesState(jvnRemoteServers, "jvnRemoteServers.ser");
 			serializeFilesState(jvnReferences, "jvnReferences.ser");
 			serializeFilesState(jvnWriteServers, "jvnWriteServers.ser");
 			serializeFilesState(jvnReadServers, "jvnReadServers.ser");
@@ -330,7 +322,6 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	
 	public void saveCoordState(){
 		serializeFilesState(jvnObjects, "jvnObjects.ser");
-		serializeFilesState(jvnRemoteServers, "jvnRemoteServers.ser");
 		serializeFilesState(jvnReferences, "jvnReferences.ser");
 		serializeFilesState(jvnWriteServers, "jvnWriteServers.ser");
 		serializeFilesState(jvnReadServers, "jvnReadServers.ser");
