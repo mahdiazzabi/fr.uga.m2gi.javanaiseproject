@@ -80,12 +80,6 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 			objectInputStream = new ObjectInputStream(fileInputStream);
 			jvnReadServers = (HashMap<Integer, ArrayList<JvnRemoteServer>>) objectInputStream.readObject();
 		
-			System.err.println("taille jvnWriteServers :" +jvnWriteServers.size());
-
-			if (jvnWriteServers.size() == 1) {
-				System.err.println(jvnWriteServers.values().toString());
-			}
-
 		} catch (FileNotFoundException e) {
 			serializeFilesState(jvnObjects, "jvnObjects.ser");
 			serializeFilesState(jvnReferences, "jvnReferences.ser");
