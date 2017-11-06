@@ -229,6 +229,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 				} catch (ConnectException e) {
 					System.err.println(e.getMessage());
 					jvnWriteServers.remove(joi);
+
 					jvnObjects.get(jvnReferences.get(joi)).updateObject(object);
 				}
 				
@@ -241,6 +242,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 		System.out.println("");
 
 		saveCoordState();
+
 		return object;
 	}
 
@@ -270,7 +272,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 				} catch (ConnectException e) {
 					System.err.println(e.getMessage());
 					jvnWriteServers.remove(joi);
-					}
+				}
 			
 			}
 		}
@@ -313,6 +315,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 				jvnWriteServers.remove(i);
 			}
 		}
+
 		for (int i = 0; i < jvnReadServers.size(); i++) {
 			for (JvnRemoteServer jvns : jvnReadServers.get(i)) {
 				if (jvns.equals(js)) {
@@ -320,10 +323,11 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 				}
 			}
 		}
+
 		saveCoordState();
 	}
 	
-	public void saveCoordState(){
+	public void saveCoordState() {
 		serializeFilesState(jvnObjects, "jvnObjects.ser");
 		serializeFilesState(jvnReferences, "jvnReferences.ser");
 		serializeFilesState(jvnWriteServers, "jvnWriteServers.ser");
@@ -375,6 +379,4 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	public void setJvnObjects(HashMap<String, JvnObject> jvnObjects) {
 		this.jvnObjects = jvnObjects;
 	}
-
-	
 }
