@@ -4,6 +4,7 @@ The goal of this project is learn how make distributed cache.
 
 ## For teacher
 La version 1 est opérationnel.
+La version 2 est opérationnel.
 
 Extension : 
 
@@ -13,6 +14,6 @@ sur read et write pour faire des tests
 - [x] Optimisation de la synchro coord/jvnObject. Toutes les méthodes du coord sont synchronized -> voir comment // read et write sur 2 objets diff
 Reduire le synchronized au grain du contenu de la methode
 - [x] Terminaison propre d'un client
-- [ ] Pannes client
-- [ ] Pannes coord
+- [x] Pannes client
+- [x] Pannes coord
 - [ ] Invocation transactionnelles 
