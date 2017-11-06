@@ -24,8 +24,10 @@ public class IrcBurst {
 			SentenceInterface sentence = (SentenceInterface) SentenceInvocationHandler.createProxyInstance("IRC");
 
 			Random r = new Random();
+
 			while (true) {
 				int valeur = r.nextInt(2);
+
 				if (valeur == 0) {
 					sentence.read();
 				} else {
@@ -35,7 +37,6 @@ public class IrcBurst {
 			}
 
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
