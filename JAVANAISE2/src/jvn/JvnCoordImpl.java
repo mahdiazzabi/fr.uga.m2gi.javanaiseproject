@@ -59,47 +59,53 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	private JvnCoordImpl() throws Exception {
 		super();
 
-		FileInputStream fin = null;
-		ObjectInputStream ois = null;
+		FileInputStream fileInputStream = null;
+		ObjectInputStream objectInputStream = null;
 
 		try {
 
-			fin = new FileInputStream("jvnObjects.ser");
-			ois = new ObjectInputStream(fin);
-			jvnObjects = (HashMap<String, JvnObject>) ois.readObject();
+			fileInputStream = new FileInputStream("jvnObjects.ser");
+			objectInputStream = new ObjectInputStream(fileInputStream);
+			jvnObjects = (HashMap<String, JvnObject>) objectInputStream.readObject();
+
+			fileInputStream = new FileInputStream("jvnReferences.ser");
+			objectInputStream = new ObjectInputStream(fileInputStream);
+			jvnReferences = (HashMap<Integer, String>) objectInputStream.readObject();
+
+			fileInputStream = new FileInputStream("jvnWriteServers.ser");
+			objectInputStream = new ObjectInputStream(fileInputStream);
+			jvnWriteServers =  (HashMap<Integer, JvnRemoteServer>) objectInputStream.readObject();
 			
-			fin = new FileInputStream("jvnReferences.ser");
-			ois = new ObjectInputStream(fin);
-			jvnReferences = (HashMap<Integer, String>) ois.readObject();
-			
-			fin = new FileInputStream("jvnWriteServers.ser");
-			ois = new ObjectInputStream(fin);
-			jvnWriteServers =  (HashMap<Integer, JvnRemoteServer>) ois.readObject();
-			
-			fin = new FileInputStream("jvnReadServers.ser");
-			ois = new ObjectInputStream(fin);
-			jvnReadServers = (HashMap<Integer, ArrayList<JvnRemoteServer>>) ois.readObject();
+			fileInputStream = new FileInputStream("jvnReadServers.ser");
+			objectInputStream = new ObjectInputStream(fileInputStream);
+			jvnReadServers = (HashMap<Integer, ArrayList<JvnRemoteServer>>) objectInputStream.readObject();
 		
-		
+			System.err.println("taille jvnWriteServers :" +jvnWriteServers.size());
+
+			if (jvnWriteServers.size() == 1) {
+				System.err.println(jvnWriteServers.values().toString());
+			}
+
 		} catch (FileNotFoundException e) {
 			serializeFilesState(jvnObjects, "jvnObjects.ser");
 			serializeFilesState(jvnReferences, "jvnReferences.ser");
 			serializeFilesState(jvnWriteServers, "jvnWriteServers.ser");
 			serializeFilesState(jvnReadServers, "jvnReadServers.ser");
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (Exception exception) {
+			exception.printStackTrace();
 		} finally {
-			if (fin != null) {
+
+			if (fileInputStream != null) {
 				try {
-					fin.close();
+					fileInputStream.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 
-			if (ois != null) {
+			if (objectInputStream != null) {
 				try {
-					ois.close();
+					objectInputStream.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -223,6 +229,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 				} catch (ConnectException e) {
 					System.err.println(e.getMessage());
 					jvnWriteServers.remove(joi);
+
 					jvnObjects.get(jvnReferences.get(joi)).updateObject(object);
 				}
 				
@@ -235,6 +242,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 		System.out.println("");
 
 		saveCoordState();
+
 		return object;
 	}
 
@@ -264,7 +272,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 				} catch (ConnectException e) {
 					System.err.println(e.getMessage());
 					jvnWriteServers.remove(joi);
-					}
+				}
 			
 			}
 		}
@@ -307,6 +315,7 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 				jvnWriteServers.remove(i);
 			}
 		}
+
 		for (int i = 0; i < jvnReadServers.size(); i++) {
 			for (JvnRemoteServer jvns : jvnReadServers.get(i)) {
 				if (jvns.equals(js)) {
@@ -314,10 +323,11 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 				}
 			}
 		}
+
 		saveCoordState();
 	}
 	
-	public void saveCoordState(){
+	public void saveCoordState() {
 		serializeFilesState(jvnObjects, "jvnObjects.ser");
 		serializeFilesState(jvnReferences, "jvnReferences.ser");
 		serializeFilesState(jvnWriteServers, "jvnWriteServers.ser");
@@ -369,6 +379,4 @@ public class JvnCoordImpl extends UnicastRemoteObject implements JvnRemoteCoord 
 	public void setJvnObjects(HashMap<String, JvnObject> jvnObjects) {
 		this.jvnObjects = jvnObjects;
 	}
-
-	
 }

@@ -14,6 +14,12 @@ sur read et write pour faire des tests
 - [x] Optimisation de la synchro coord/jvnObject. Toutes les méthodes du coord sont synchronized -> voir comment // read et write sur 2 objets diff
 Reduire le synchronized au grain du contenu de la methode
 - [x] Terminaison propre d'un client
-- [x] Pannes client
+- [x] Pannes client avec perte de message
 - [x] Pannes coord
 - [ ] Invocation transactionnelles 
+- [ ] Gestion de la saturation d’un cache client
+- [ ] Décentraliser le coordinateur
+- [ ] Invocations transactionnelles
+- [ ] Supporter des clients multi-threadés
+- [ ] Permettre à un objet Javanaise de contenir
+      une référence vers un autre objet Javanaise
